@@ -1,14 +1,14 @@
-# B3603
+# B3606 based on B3603
 
-This project is about reverse engineering the B3603 control board and figuring
+This project is about reverse engineering the B3606 control board and figuring
 out how it works, then it should be possible to create an alternative firmware.
 Either by driving it with another board on the same control points or by
 replacing the original firmware with one of my own.
 
-**Current state**: Working, it is functioning and serially controllable.
+**Current state**: Testing //Working, it is functioning and serially controllable.
 
 Components needed:
-* [B3603](http://www.banggood.com/B3603-Precision-CNC-DC-DC-Digital-Buck-Module-Constant-Voltage-Current-p-946751.html?p=PA11121233669201502E) -- The unit being reprogrammed
+* [B3606](https://www.banggood.com/B3606-NC-Digital-DC-DC-Step-Down-Buck-Module-Constant-Voltage-Current-p-947293.html?rmmds=search) -- The unit being reprogrammed
 * [CP2102](http://www.banggood.com/Wholesale-USB-To-TTL-or-COM-Converter-Module-buildin-in-CP2102-New-p-27989.html?p=PA11121233669201502E) -- A usb-to-serial TTL-level
 * [STLink V2](http://www.aliexpress.com/item/FREE-SHIPPING-ST-Link-V2-stlink-mini-STM8STM32-STLINK-simulator-download-programming-With-Cover/1766455290.html) -- programmer for the STM8S microcontroller
 
@@ -20,7 +20,7 @@ These were done by flex, the discussion can be seen in the EEVBlog forum (link a
 
 Bottom board schematics:
 
-![B3603 Bottom Board Schematics](docs/B3603_BottomBoardSchematics.png)
+![B3606 Bottom Board Schematics](docs/B3606.pdf)
 
 Top board schematics:
 
@@ -123,7 +123,7 @@ There are two 74HC595 TSSOP16, these control the 4 digit 7 segment display, and 
 * [EEVBlog forum discussion](http://www.eevblog.com/forum/reviews/b3603-dcdc-buck-converter-mini-review-and-how-the-set-key-could-be-fatal/)
 
 Components needed:
-* [B3603](http://www.banggood.com/B3603-Precision-CNC-DC-DC-Digital-Buck-Module-Constant-Voltage-Current-p-946751.html?p=PA11121233669201502E) -- The unit being reprogrammed
+* [B3606](https://www.banggood.com/B3606-NC-Digital-DC-DC-Step-Down-Buck-Module-Constant-Voltage-Current-p-947293.html?rmmds=search) -- The unit being reprogrammed
 * [CP2102](http://www.banggood.com/Wholesale-USB-To-TTL-or-COM-Converter-Module-buildin-in-CP2102-New-p-27989.html?p=PA11121233669201502E) -- A usb-to-serial TTL-level
 * [STLink V2](http://www.aliexpress.com/item/FREE-SHIPPING-ST-Link-V2-stlink-mini-STM8STM32-STLINK-simulator-download-programming-With-Cover/1766455290.html) -- programmer for the STM8S microcontroller
 
