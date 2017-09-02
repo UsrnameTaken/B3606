@@ -10,7 +10,11 @@ replacing the original firmware with one of my own.
 Components needed:
 * [B3606](https://www.banggood.com/B3606-NC-Digital-DC-DC-Step-Down-Buck-Module-Constant-Voltage-Current-p-947293.html?rmmds=search) -- The unit being reprogrammed
 * [CP2102](http://www.banggood.com/Wholesale-USB-To-TTL-or-COM-Converter-Module-buildin-in-CP2102-New-p-27989.html?p=PA11121233669201502E) -- A usb-to-serial TTL-level
-* [STLink V2](http://www.aliexpress.com/item/FREE-SHIPPING-ST-Link-V2-stlink-mini-STM8STM32-STLINK-simulator-download-programming-With-Cover/1766455290.html) -- programmer for the STM8S microcontroller
+* [STLink V2](http://www.aliexpress.com/item/FREE-SHIPPING-ST-Link-V2-stlink-mini-STM8STM32-STLINK-simulator-download-programming-With-Cover/1766455290.html) or STLink/V2 mini -- programmer for the STM8S microcontroller
+
+Software needed:
+* [SDCC v 3.5.0](https://sourceforge.net/projects/sdcc/files/sdcc-linux-x86/3.5.0/) -- source code compiler
+* [stm8flash](https://github.com/vdudouyt/stm8flash) -- STM8 flasher
 
 ## Schematics
 
@@ -42,6 +46,10 @@ Top board schematics:
 ### MCU
 
 The MCU is an [STM8S003F3](http://www.st.com/web/catalog/mmc/FM141/SC1244/SS1010/LN2/PF251792). It is the TSSOP-20 package.
+
+### Compiling and flashing
+To compile source code use command: make SHELL='sh -x'
+To flash .ihx hex file into STM8 use command: ./stm8flash -c stlinkv2 -p stm8s003?3 -s flash -w b3606.ihx
 
 ### Pinouts
 
