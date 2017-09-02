@@ -49,6 +49,7 @@ The MCU is an [STM8S003F3](http://www.st.com/web/catalog/mmc/FM141/SC1244/SS1010
 
 ### Compiling and flashing
 To compile source code use command: make SHELL='sh -x'
+
 To flash .ihx hex file into STM8 use command: ./stm8flash -c stlinkv2 -p stm8s003?3 -s flash -w b3606.ihx
 
 ### Pinouts
