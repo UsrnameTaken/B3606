@@ -17,7 +17,7 @@
  */
 
 #define FW_VERSION "1.0.1"
-#define MODEL "B3603"
+#define MODEL "B3606"
 
 #include "stm8s.h"
 #include <string.h>
@@ -34,11 +34,11 @@
 #include "adc.h"
 
 #define CAP_VMIN 10 // 10mV
-#define CAP_VMAX 35000 // 35 V
+#define CAP_VMAX 36000 // 36 V
 #define CAP_VSTEP 10 // 10mV
 
 #define CAP_CMIN 1 // 1 mA
-#define CAP_CMAX 3000 // 3 A
+#define CAP_CMAX 6000 // 6 A
 #define CAP_CSTEP 1 // 1 mA
 
 cfg_system_t cfg_system;
@@ -75,7 +75,7 @@ void set_name(uint8_t *name)
 
 	uart_write_str("SNAME: ");
 	uart_write_str(cfg_system.name);
-	uart_write_str("\r\n");
+	uart_write_str("\n");
 }
 
 void autocommit(void)
@@ -83,7 +83,7 @@ void autocommit(void)
 	if (cfg_system.autocommit) {
 		commit_output();
 	} else {
-		uart_write_str("AUTOCOMMIT OFF: CHANGE PENDING ON COMMIT\r\n");
+		uart_write_str("AUTOCOMMIT OFF: CHANGE PENDING ON COMMIT\n");
 	}
 }
 
@@ -92,20 +92,20 @@ void set_output(uint8_t *s)
 	if (s[1] != 0) {
 		uart_write_str("OUTPUT takes either 0 for OFF or 1 for ON, received: \"");
 		uart_write_str(s);
-		uart_write_str("\"\r\n");
+		uart_write_str("\"\n");
 		return;
 	}
 
 	if (s[0] == '0') {
 		cfg_system.output = 0;
-		uart_write_str("OUTPUT: OFF\r\n");
+		uart_write_str("OUTPUT: OFF\n");
 	} else if (s[0] == '1') {
 		cfg_system.output = 1;
-		uart_write_str("OUTPUT: ON\r\n");
+		uart_write_str("OUTPUT: ON\n");
 	} else {
 		uart_write_str("OUTPUT takes either 0 for OFF or 1 for ON, received: \"");
 		uart_write_str(s);
-		uart_write_str("\"\r\n");
+		uart_write_str("\"\n");
 	}
 
 	autocommit();
@@ -120,17 +120,17 @@ void set_voltage(uint8_t *s)
 		return;
 
 	if (val > CAP_VMAX) {
-		uart_write_str("VOLTAGE VALUE TOO HIGH\r\n");
+		uart_write_str("VOLTAGE VALUE TOO HIGH\n");
 		return;
 	}
 	if (val < CAP_VMIN) {
-		uart_write_str("VOLTAGE VALUE TOO LOW\r\n");
+		uart_write_str("VOLTAGE VALUE TOO LOW\n");
 		return;
 	}
 
 	uart_write_str("VOLTAGE: SET ");
 	uart_write_millivolt(val);
-	uart_write_str("\r\n");
+	uart_write_str("\n");
 	cfg_output.vset = val;
 
 	autocommit();
@@ -145,17 +145,17 @@ void set_current(uint8_t *s)
 		return;
 
 	if (val > CAP_CMAX) {
-		uart_write_str("CURRENT VALUE TOO HIGH\r\n");
+		uart_write_str("CURRENT VALUE TOO HIGH\n");
 		return;
 	}
 	if (val < CAP_CMIN) {
-		uart_write_str("CURRENT VALUE TOO LOW\r\n");
+		uart_write_str("CURRENT VALUE TOO LOW\n");
 		return;
 	}
 
 	uart_write_str("CURRENT: SET ");
 	uart_write_milliamp(val);
-	uart_write_str("\r\n");
+	uart_write_str("\n");
 	cfg_output.cset = val;
 
 	autocommit();
@@ -165,14 +165,14 @@ void set_autocommit(uint8_t *s)
 {
 	if (strcmp(s, "1") == 0 || strcmp(s, "YES") == 0) {
 		cfg_system.autocommit = 1;
-		uart_write_str("AUTOCOMMIT: YES\r\n");
+		uart_write_str("AUTOCOMMIT: YES\n");
 	} else if (strcmp(s, "0") == 0 || strcmp(s, "NO") == 0) {
 		cfg_system.autocommit = 0;
-		uart_write_str("AUTOCOMMIT: NO\r\n");
+		uart_write_str("AUTOCOMMIT: NO\n");
 	} else {
 		uart_write_str("UNKNOWN AUTOCOMMIT ARG: ");
 		uart_write_str(s);
-		uart_write_str("\r\n");
+		uart_write_str("\n");
 	}
 }
 
@@ -180,7 +180,7 @@ void write_str(const char *prefix, const char *val)
 {
 	uart_write_str(prefix);
 	uart_write_str(val);
-	uart_write_str("\r\n");
+	uart_write_str("\n");
 }
 
 void write_onoff(const char *prefix, uint8_t on)
@@ -192,21 +192,21 @@ void write_millivolt(const char *prefix, uint16_t mv)
 {
 	uart_write_str(prefix);
 	uart_write_millivolt(mv);
-	uart_write_str("\r\n");
+	uart_write_str("\n");
 }
 
 void write_milliamp(const char *prefix, uint16_t ma)
 {
 	uart_write_str(prefix);
 	uart_write_milliamp(ma);
-	uart_write_str("\r\n");
+	uart_write_str("\n");
 }
 
 void write_int(const char *prefix, uint16_t val)
 {
 	uart_write_str(prefix);
 	uart_write_int(val);
-	uart_write_str("\r\n");
+	uart_write_str("\n");
 }
 
 uint32_t _parse_uint(uint8_t *s)
@@ -238,7 +238,7 @@ void parse_uint(const char *name, uint32_t *pval, uint8_t *s)
 		uart_write_str("CALIBRATION SET ");
 		uart_write_str(name);
 	}
-	uart_write_str("\r\n");
+	uart_write_str("\n");
 }
 
 void process_input()
@@ -247,11 +247,11 @@ void process_input()
 	uart_read_buf[uart_read_len-1] = 0;
 
 	if (strcmp(uart_read_buf, "MODEL") == 0) {
-		uart_write_str("MODEL: " MODEL "\r\n");
+		uart_write_str("MODEL: " MODEL "\n");
 	} else if (strcmp(uart_read_buf, "VERSION") == 0) {
-		uart_write_str("VERSION: " FW_VERSION "\r\n");
+		uart_write_str("VERSION: " FW_VERSION "\n");
 	} else if (strcmp(uart_read_buf, "SYSTEM") == 0) {
-		uart_write_str("MODEL: " MODEL "\r\n" "VERSION: " FW_VERSION "\r\n");
+		uart_write_str("MODEL: " MODEL "\n" "VERSION: " FW_VERSION "\n");
 
 		write_str("NAME: ", cfg_system.name);
 		write_onoff("ONSTARTUP: ", cfg_system.default_on);
@@ -261,55 +261,55 @@ void process_input()
 		uart_write_fixed_point(cfg_system.vin_adc.a);
 		uart_write_ch('/');
 		uart_write_fixed_point(cfg_system.vin_adc.b);
-		uart_write_str("\r\n");
+		uart_write_str("\n");
 		uart_write_str("CALIBRATE VOUT ADC: ");
 		uart_write_fixed_point(cfg_system.vout_adc.a);
 		uart_write_ch('/');
 		uart_write_fixed_point(cfg_system.vout_adc.b);
-		uart_write_str("\r\n");
+		uart_write_str("\n");
 		uart_write_str("CALIBRATE COUT ADC: ");
 		uart_write_fixed_point(cfg_system.cout_adc.a);
 		uart_write_ch('/');
 		uart_write_fixed_point(cfg_system.cout_adc.b);
-		uart_write_str("\r\n");
+		uart_write_str("\n");
 		uart_write_str("CALIBRATE VOUT PWM: ");
 		uart_write_fixed_point(cfg_system.vout_pwm.a);
 		uart_write_ch('/');
 		uart_write_fixed_point(cfg_system.vout_pwm.b);
-		uart_write_str("\r\n");
+		uart_write_str("\n");
 		uart_write_str("CALIBRATE COUT PWM: ");
 		uart_write_fixed_point(cfg_system.cout_pwm.a);
 		uart_write_ch('/');
 		uart_write_fixed_point(cfg_system.cout_pwm.b);
-		uart_write_str("\r\n");
+		uart_write_str("\n");
 	} else if (strcmp(uart_read_buf, "RCALIBRATION") == 0) {
 		uart_write_str("CALIBRATE VIN ADC: ");
 		uart_write_int32(cfg_system.vin_adc.a);
 		uart_write_ch('/');
 		uart_write_int32(cfg_system.vin_adc.b);
-		uart_write_str("\r\n");
+		uart_write_str("\n");
 		uart_write_str("CALIBRATE VOUT ADC: ");
 		uart_write_int32(cfg_system.vout_adc.a);
 		uart_write_ch('/');
 		uart_write_int32(cfg_system.vout_adc.b);
-		uart_write_str("\r\n");
+		uart_write_str("\n");
 		uart_write_str("CALIBRATE COUT ADC: ");
 		uart_write_int32(cfg_system.cout_adc.a);
 		uart_write_ch('/');
 		uart_write_int32(cfg_system.cout_adc.b);
-		uart_write_str("\r\n");
+		uart_write_str("\n");
 		uart_write_str("CALIBRATE VOUT PWM: ");
 		uart_write_int32(cfg_system.vout_pwm.a);
 		uart_write_ch('/');
 		uart_write_int32(cfg_system.vout_pwm.b);
-		uart_write_str("\r\n");
+		uart_write_str("\n");
 		uart_write_str("CALIBRATE COUT PWM: ");
 		uart_write_int32(cfg_system.cout_pwm.a);
 		uart_write_ch('/');
 		uart_write_int32(cfg_system.cout_pwm.b);
 		uart_write_ch('\r');
 	} else if (strcmp(uart_read_buf, "LIMITS") == 0) {
-		uart_write_str("LIMITS:\r\n");
+		uart_write_str("LIMITS:\n");
 		write_millivolt("VMIN: ", CAP_VMIN);
 		write_millivolt("VMAX: ", CAP_VMAX);
 		write_millivolt("VSTEP: ", CAP_VSTEP);
@@ -317,21 +317,21 @@ void process_input()
 		write_milliamp("CMAX: ", CAP_CMAX);
 		write_milliamp("CSTEP: ", CAP_CSTEP);
 	} else if (strcmp(uart_read_buf, "CONFIG") == 0) {
-		uart_write_str("CONFIG:\r\n");
+		uart_write_str("CONFIG:\n");
 		write_onoff("OUTPUT: ", cfg_system.output);
 		write_millivolt("VSET: ", cfg_output.vset);
 		write_milliamp("CSET: ", cfg_output.cset);
 		write_millivolt("VSHUTDOWN: ", cfg_output.vshutdown);
 		write_millivolt("CSHUTDOWN: ", cfg_output.cshutdown);
 	} else if (strcmp(uart_read_buf, "STATUS") == 0) {
-		uart_write_str("STATUS:\r\n");
+		uart_write_str("STATUS:\n");
 		write_onoff("OUTPUT: ", cfg_system.output);
 		write_millivolt("VIN: ", state.vin);
 		write_millivolt("VOUT: ", state.vout);
 		write_milliamp("COUT: ", state.cout);
 		write_str("CONSTANT: ", state.constant_current ? "CURRENT" : "VOLTAGE");
 	} else if (strcmp(uart_read_buf, "RSTATUS") == 0) {
-		uart_write_str("RSTATUS:\r\n");
+		uart_write_str("RSTATUS:\n");
 		write_onoff("OUTPUT: ", cfg_system.output);
 		write_int("VIN ADC: ", state.vin_raw);
 		write_millivolt("VIN: ", state.vin);
@@ -345,7 +345,7 @@ void process_input()
 	} else if (strcmp(uart_read_buf, "SAVE") == 0) {
 		config_save_system(&cfg_system);
 		config_save_output(&cfg_output);
-		uart_write_str("SAVED\r\n");
+		uart_write_str("SAVED\n");
 	} else if (strcmp(uart_read_buf, "LOAD") == 0) {
 		config_load_system(&cfg_system);
 		config_load_output(&cfg_output);
@@ -357,7 +357,7 @@ void process_input()
 #if DEBUG
 	} else if (strcmp(uart_read_buf, "STUCK") == 0) {
 		// Allows debugging of the IWDG feature
-		uart_write_str("STUCK\r\n");
+		uart_write_str("STUCK\n");
 		uart_write_flush();
 		while(1); // Induce watchdog reset
 #endif
@@ -414,13 +414,13 @@ void process_input()
 			} else if (strcmp(uart_read_buf, "CALCOUTPWMB") == 0) {
 				parse_uint("PWM COUT B", &cfg_system.cout_pwm.b, uart_read_buf+idx+1);
 			} else {
-				uart_write_str("UNKNOWN COMMAND!\r\n");
+				uart_write_str("UNKNOWN COMMAND!\n");
 			}
 		} else {
-			uart_write_str("UNKNOWN COMMAND\r\n");
+			uart_write_str("UNKNOWN COMMAND\n");
 		}
 	}
-	uart_write_str("DONE\r\n");
+	//uart_write_str("DONE\n");
 
 	uart_read_len = 0;
 	read_newline = 0;
@@ -486,9 +486,9 @@ void read_state(void)
 
 	tmp = (PC_IDR & (1<<3)) ? 1 : 0;
 	if (state.pc3 != tmp) {
-		uart_write_str("PC3 is now ");
-		uart_write_ch('0' + tmp);
-		uart_write_str("\r\n");
+		//uart_write_str("PC3 is now ");
+		//uart_write_ch('0' + tmp);
+		//uart_write_str("\n");
 		state.pc3 = tmp;
 	}
 
@@ -545,13 +545,13 @@ void ensure_afr0_set(void)
 	if ((OPT2 & 1) == 0) {
 		uart_flush_writes();
 		if (eeprom_set_afr0()) {
-			uart_write_str("AFR0 set, reseting the unit\r\n");
+			uart_write_str("AFR0 set, reseting the unit\n");
 			uart_flush_writes();
 			iwatchdog_init();
 			while (1); // Force a reset in a few msec
 		}
 		else {
-			uart_write_str("AFR0 not set and programming failed!\r\n");
+			uart_write_str("AFR0 not set and programming failed!\n");
 		}
 	}
 }
@@ -568,7 +568,7 @@ int main()
 
 	config_load();
 
-	uart_write_str("\r\n" MODEL " starting: Version " FW_VERSION "\r\n");
+	uart_write_str(MODEL " starting: Version " FW_VERSION "\n");
 
 	ensure_afr0_set();
 
