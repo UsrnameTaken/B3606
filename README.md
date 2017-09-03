@@ -4,6 +4,7 @@ This project is about reverse engineering the B3606 control board and figuring
 out how it works, then it should be possible to create an alternative firmware.
 Either by driving it with another board on the same control points or by
 replacing the original firmware with one of my own.
+The difference between B3603 and B3606 is only in converter part.
 
 **Current state**: Testing //Working, it is functioning and serially controllable. Code size 7653 bytes.
 
