@@ -34,7 +34,7 @@ test_parse: test_parse.c parse.c
 	gcc -g -Wall -o $@ $< -DTEST=1
 
 deploy: b3606.ihx
-	stm8flash -c stlinkv2 -p stm8s003f3 -s flash -w $<
+	stm8flash -c stlinkv2 -p stm8s003f3 -s flash -w b3606.ihx
 
 clean:
 	-rm -f *.rel *.ihx *.lk *.map *.rst *.lst *.asm *.sym .*.d
