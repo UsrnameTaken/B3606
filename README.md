@@ -5,7 +5,7 @@ out how it works, then it should be possible to create an alternative firmware.
 Either by driving it with another board on the same control points or by
 replacing the original firmware with one of my own.
 
-**Current state**: Testing //Working, it is functioning and serially controllable.
+**Current state**: Testing //Working, it is functioning and serially controllable. Code size 7653 bytes.
 
 Components needed:
 * [B3606](https://www.banggood.com/B3606-NC-Digital-DC-DC-Step-Down-Buck-Module-Constant-Voltage-Current-p-947293.html?rmmds=search) -- The unit being reprogrammed
