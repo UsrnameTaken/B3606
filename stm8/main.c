@@ -49,13 +49,59 @@ cfg_system_t cfg_system;
 cfg_output_t cfg_output;
 state_t state;
 
-inline iwatchdog_init(void)
+void write_str(const char *prefix, const char *val)
+{
+	uart_write_str(prefix);
+	uart_write_str(val);
+	uart_write_str("\r\n");
+}
+
+void write_onoff(const char *prefix, uint8_t on)
+{
+	write_str(prefix, on ? "ON" : "OFF");
+}
+
+void write_milli(const char *prefix, uint16_t val) //milli/amps/volts are passed here
+{
+	uart_write_str(prefix);
+	uart_write_milli(val);
+	uart_write_str("\r\n");
+}
+
+void write_uint(const char *prefix, uint16_t val) //integers only
+{
+	uart_write_str(prefix);
+	uart_write_uint(val);
+	uart_write_str("\r\n");
+}
+
+static void write_calibration_fixed_point(const char* prefix, calibrate_t *cal)
+{
+	uart_write_str("CALIBRATE ");
+	uart_write_str(prefix);
+	uart_write_fixed_point(cal->a);
+	uart_write_ch('/');
+	uart_write_fixed_point(cal->b);
+	uart_write_str("\r\n");
+}
+
+static void write_calibration_uint(const char* prefix, calibrate_t *cal)
+{
+	uart_write_str("CALIBRATE ");
+	uart_write_str(prefix);
+	uart_write_uint(cal->a);
+	uart_write_ch('/');
+	uart_write_uint(cal->b);
+	uart_write_str("\r\n");
+}
+
+inline void iwatchdog_init(void)
 {
 	IWDG_KR = 0xCC; // Enable IWDG
 	// The default values give us about 15msec between pings
 }
 
-inline iwatchdog_tick(void)
+inline void iwatchdog_tick(void)
 {
 	IWDG_KR = 0xAA; // Reset the counter
 }
@@ -77,9 +123,7 @@ void set_name(uint8_t *name)
 	memcpy(cfg_system.name, name, sizeof(cfg_system.name));
 	cfg_system.name[sizeof(cfg_system.name)-1] = 0;
 
-	uart_write_str("SNAME: ");
-	uart_write_str(cfg_system.name);
-	uart_write_str("\r\n");
+	write_str("NAME: ", cfg_system.name);
 }
 
 void autocommit(void)
@@ -94,8 +138,8 @@ void autocommit(void)
 void set_output(uint8_t *s)
 {
 	if (s[1] != 0) {
-		uart_write_str("OUTPUT takes either 0 for OFF or 1 for ON, received: \"");
-		uart_write_str(s);
+		write_str("OUTPUT takes either 0 for OFF or 1 for ON, received: \"", s);
+		//uart_write_str(s);
 		uart_write_str("\"\r\n");
 		return;
 	}
@@ -107,8 +151,8 @@ void set_output(uint8_t *s)
 		cfg_system.output = 1;
 		uart_write_str("OUTPUT: ON\r\n");
 	} else {
-		uart_write_str("OUTPUT takes either 0 for OFF or 1 for ON, received: \"");
-		uart_write_str(s);
+		write_str("OUTPUT takes either 0 for OFF or 1 for ON, received: \"", s);
+		//uart_write_str(s);
 		uart_write_str("\"\r\n");
 	}
 
@@ -132,9 +176,7 @@ void set_voltage(uint8_t *s)
 		return;
 	}
 
-	uart_write_str("VOLTAGE: SET ");
-	uart_write_milli(val);
-	uart_write_str("\r\n");
+	write_milli("VOLTAGE: SET ", val);
 	cfg_output.vset = val;
 
 	autocommit();
@@ -157,9 +199,7 @@ void set_current(uint8_t *s)
 		return;
 	}
 
-	uart_write_str("CURRENT: SET ");
-	uart_write_milli(val);
-	uart_write_str("\r\n");
+	write_milli("CURRENT: SET ", val);
 	cfg_output.cset = val;
 
 	autocommit();
@@ -174,36 +214,10 @@ void set_autocommit(uint8_t *s)
 		cfg_system.autocommit = 0;
 		uart_write_str("AUTOCOMMIT: NO\r\n");
 	} else {
-		uart_write_str("UNKNOWN AUTOCOMMIT ARG: ");
-		uart_write_str(s);
+		write_str("UNKNOWN AUTOCOMMIT ARG: ", s);
+		//uart_write_str(s);
 		uart_write_str("\r\n");
 	}
-}
-
-void write_str(const char *prefix, const char *val)
-{
-	uart_write_str(prefix);
-	uart_write_str(val);
-	uart_write_str("\r\n");
-}
-
-void write_onoff(const char *prefix, uint8_t on)
-{
-	write_str(prefix, on ? "ON" : "OFF");
-}
-
-void write_milli(const char *prefix, uint16_t val) //milli/amps/volts are passed here
-{
-	uart_write_str(prefix);
-	uart_write_milli(val);
-	uart_write_str("\r\n");
-}
-
-void write_int(const char *prefix, uint16_t val) //integers only
-{
-	uart_write_str(prefix);
-	uart_write_int(val);
-	uart_write_str("\r\n");
 }
 
 uint32_t _parse_uint(uint8_t *s)
@@ -226,8 +240,8 @@ void parse_uint(const char *name, uint32_t *pval, uint8_t *s)
 {
 	uint32_t val = _parse_uint(s);
 	if (val == 0xFFFFFFFF) {
-		uart_write_str("FAILED TO PARSE ");
-		uart_write_str(s);
+		write_str("FAILED TO PARSE ", s);
+		//uart_write_str(s);
 		uart_write_str(" FOR ");
 		uart_write_str(name);
 	} else {
@@ -254,57 +268,17 @@ void process_input()
 		write_onoff("ONSTARTUP: ", cfg_system.default_on);
 		write_onoff("AUTOCOMMIT: ", cfg_system.autocommit);
 	} else if (strcmp(uart_read_buf, "CALIBRATION") == 0) {
-		uart_write_str("CALIBRATE VIN ADC: ");
-		uart_write_fixed_point(cfg_system.vin_adc.a);
-		uart_write_ch('/');
-		uart_write_fixed_point(cfg_system.vin_adc.b);
-		//uart_write_str("");
-		uart_write_str("\r\nCALIBRATE VOUT ADC: ");
-		uart_write_fixed_point(cfg_system.vout_adc.a);
-		uart_write_ch('/');
-		uart_write_fixed_point(cfg_system.vout_adc.b);
-		//uart_write_str("");
-		uart_write_str("\r\nCALIBRATE COUT ADC: ");
-		uart_write_fixed_point(cfg_system.cout_adc.a);
-		uart_write_ch('/');
-		uart_write_fixed_point(cfg_system.cout_adc.b);
-		//uart_write_str("");
-		uart_write_str("\r\nCALIBRATE VOUT PWM: ");
-		uart_write_fixed_point(cfg_system.vout_pwm.a);
-		uart_write_ch('/');
-		uart_write_fixed_point(cfg_system.vout_pwm.b);
-		//uart_write_str("");
-		uart_write_str("\r\nCALIBRATE COUT PWM: ");
-		uart_write_fixed_point(cfg_system.cout_pwm.a);
-		uart_write_ch('/');
-		uart_write_fixed_point(cfg_system.cout_pwm.b);
-		uart_write_str("\r\n");
+		write_calibration_fixed_point("VIN ADC: ", &cfg_system.vin_adc);
+		write_calibration_fixed_point("VOUT ADC: ", &cfg_system.vout_adc);
+		write_calibration_fixed_point("COUT ADC: ", &cfg_system.cout_adc);
+		write_calibration_fixed_point("VOUT PWM: ", &cfg_system.vout_pwm);
+		write_calibration_fixed_point("COUT PWM: ", &cfg_system.cout_pwm);
 	} else if (strcmp(uart_read_buf, "RCALIBRATION") == 0) {
-		uart_write_str("CALIBRATE VIN ADC: ");
-		uart_write_int32(cfg_system.vin_adc.a);
-		uart_write_ch('/');
-		uart_write_int32(cfg_system.vin_adc.b);
-		//uart_write_str("");
-		uart_write_str("\r\nCALIBRATE VOUT ADC: ");
-		uart_write_int32(cfg_system.vout_adc.a);
-		uart_write_ch('/');
-		uart_write_int32(cfg_system.vout_adc.b);
-		//uart_write_str("");
-		uart_write_str("\r\nCALIBRATE COUT ADC: ");
-		uart_write_int32(cfg_system.cout_adc.a);
-		uart_write_ch('/');
-		uart_write_int32(cfg_system.cout_adc.b);
-		//uart_write_str("");
-		uart_write_str("\r\nCALIBRATE VOUT PWM: ");
-		uart_write_int32(cfg_system.vout_pwm.a);
-		uart_write_ch('/');
-		uart_write_int32(cfg_system.vout_pwm.b);
-		//uart_write_str("");
-		uart_write_str("\r\nCALIBRATE COUT PWM: ");
-		uart_write_int32(cfg_system.cout_pwm.a);
-		uart_write_ch('/');
-		uart_write_int32(cfg_system.cout_pwm.b);
-		uart_write_ch('\r');
+		write_calibration_uint("VIN ADC: ", &cfg_system.vin_adc);
+		write_calibration_uint("VOUT ADC: ", &cfg_system.vout_adc);
+		write_calibration_uint("COUT ADC: ", &cfg_system.cout_adc);
+		write_calibration_uint("VOUT PWM: ", &cfg_system.vout_pwm);
+		write_calibration_uint("COUT PWM: ", &cfg_system.cout_pwm);
 	} else if (strcmp(uart_read_buf, "LIMITS") == 0) {
 		uart_write_str("LIMITS:\r\n");
 		write_milli("VMIN: ", CAP_VMIN);
@@ -330,11 +304,11 @@ void process_input()
 	} else if (strcmp(uart_read_buf, "RSTATUS") == 0) {
 		uart_write_str("RSTATUS:\r\n");
 		write_onoff("OUTPUT: ", cfg_system.output);
-		write_int("VIN ADC: ", state.vin_raw);
+		write_uint("VIN ADC: ", state.vin_raw);
 		write_milli("VIN: ", state.vin);
-		write_int("VOUT ADC: ", state.vout_raw);
+		write_uint("VOUT ADC: ", state.vout_raw);
 		write_milli("VOUT: ", state.vout);
-		write_int("COUT ADC: ", state.cout_raw);
+		write_uint("COUT ADC: ", state.cout_raw);
 		write_milli("COUT: ", state.cout);
 		write_str("CONSTANT: ", state.constant_current ? "CURRENT" : "VOLTAGE");
 	} else if (strcmp(uart_read_buf, "COMMIT") == 0) {
@@ -450,7 +424,7 @@ inline void pinout_init()
 	// PC6 is Iout control, output
 	// PC7 is Button 1, input
 	PC_ODR = 0;
-	PC_DDR = (1<<5) || (1<<6);
+	PC_DDR = (1<<5) | (1<<6);
 	PC_CR1 = (1<<7); // For the button
 	PC_CR2 = (1<<5) | (1<<6);
 
@@ -468,11 +442,7 @@ void config_load(void)
 	config_load_system(&cfg_system);
 	config_load_output(&cfg_output);
 
-	if (cfg_system.default_on)
-		cfg_system.output = 1;
-	else
-		cfg_system.output = 0;
-
+	cfg_system.output = !!cfg_system.default_on;
 	state.pc3 = 1;
 }
 
@@ -480,7 +450,7 @@ void read_state(void)
 {
 	uint8_t tmp;
 
-	tmp = (PC_IDR & (1<<3)) ? 1 : 0;
+	tmp = (PC_IDR >> 3) & 1;
 	if (state.pc3 != tmp) {
 		//uart_write_str("PC3 is now ");
 		//uart_write_ch('0' + tmp);
@@ -488,7 +458,7 @@ void read_state(void)
 		state.pc3 = tmp;
 	}
 
-	tmp = (PB_IDR & (1<<5)) ? 1 : 0;
+	tmp = (PB_IDR >> 5) & 1;
 	if (state.constant_current != tmp) {
 		state.constant_current = tmp;
 		output_check_state(&cfg_system, state.constant_current);

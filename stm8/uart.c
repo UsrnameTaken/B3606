@@ -39,10 +39,10 @@ void uart_init()
 
 	USART1_CR2 = USART_CR2_TEN | USART_CR2_REN; // Allow TX & RX
 
-	uart_write_len = 0;
-	uart_write_start = 0;
-	uart_read_len = 0;
-	read_newline = 0;
+	uart_write_len, uart_write_start, uart_read_len, read_newline; //globals are initialized by 0 by default
+	//uart_write_start = 0;
+	//uart_read_len = 0;
+	//read_newline = 0;
 }
 
 inline uint8_t uart_write_ready(void)
@@ -75,13 +75,13 @@ void uart_write_str(const char *str)
 }
 
 uint8_t digits_buf[12];
-static uint8_t int_to_digits(uint8_t num, uint32_t val)
+static uint8_t uint_to_digits(uint32_t val)
 {
 	uint8_t i;
 	uint8_t num_digits = 0;
 
 	digits_buf[0] = '0';
-	for (i = 0; i < num && val != 0; i++) { //variable num tells function about val size
+	for (i = 0; i < 12 && val != 0; i++) {
 		uint8_t digit = val % 10;
 		digits_buf[i] = '0' + digit;
 		val /= 10;
@@ -92,24 +92,12 @@ static uint8_t int_to_digits(uint8_t num, uint32_t val)
 	return num_digits + 1;
 }
 
-void uart_write_int(uint16_t val)
+void uart_write_uint(uint32_t val)
 {
 	int8_t i;
 	uint8_t highest_nonzero;
 
-	highest_nonzero = int_to_digits(16, val);
-
-	for (i = highest_nonzero-1; i >= 0; i--) {
-		uart_write_ch(digits_buf[i]);
-	}
-}
-
-void uart_write_int32(uint32_t val)
-{
-	int8_t i;
-	uint8_t highest_nonzero;
-
-	highest_nonzero = int_to_digits(32, val);
+	highest_nonzero = uint_to_digits(val);
 
 	for (i = highest_nonzero-1; i >= 0; i--) {
 		uart_write_ch(digits_buf[i]);
@@ -121,7 +109,7 @@ void uart_write_milli(uint16_t val) //print milli/amps/volts to uart
 	int8_t i;
 	uint8_t highest_nonzero;
 
-	highest_nonzero = int_to_digits(16, val);
+	highest_nonzero = uint_to_digits(val);
 
 	for (i = highest_nonzero-1; i >= 0; i--) {
 		if (i == 2)
@@ -136,7 +124,7 @@ void uart_write_fixed_point(uint32_t val)
 
 	// Print the integer part
 	tmp = val >> FIXED_SHIFT;
-	uart_write_int32(tmp);
+	uart_write_uint(tmp);
 	uart_write_ch('.');
 
 	// Remove the integer part
@@ -154,7 +142,7 @@ void uart_write_fixed_point(uint32_t val)
 		uart_write_ch('0');
 
 	// Write the remaining fractional part
-	uart_write_int32(tmp);
+	uart_write_uint(tmp);
 }
 
 void uart_write_from_buf(void)

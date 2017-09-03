@@ -33,7 +33,10 @@ test_adc_accuracy: test_adc_accuracy.c config.c adc.c fixedpoint.c
 test_parse: test_parse.c parse.c
 	gcc -g -Wall -o $@ $< -DTEST=1
 
+deploy: b3606.ihx
+	stm8flash -c stlinkv2 -p stm8s003f3 -s flash -w $<
+
 clean:
 	-rm -f *.rel *.ihx *.lk *.map *.rst *.lst *.asm *.sym .*.d
 
-.PHONY: all clean check_size
+.PHONY: all clean check_size deploy
