@@ -6,7 +6,7 @@ Either by driving it with another board on the same control points or by
 replacing the original firmware with one of my own.
 The difference between B3603 and B3606 is only in converter part.
 
-**Current state**: Testing //Working, it is functioning and serially controllable. Code size 7653 bytes (original is 7930).
+**Current state**: Testing //Working, it is functioning and serially controllable. Code size 7231 bytes (original is 7930).
 
 Components needed:
 * [B3606](https://www.banggood.com/B3606-NC-Digital-DC-DC-Step-Down-Buck-Module-Constant-Voltage-Current-p-947293.html?rmmds=search) -- The unit being reprogrammed
