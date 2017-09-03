@@ -28,7 +28,6 @@ void uart_write_str(const char *str);
 void uart_write_int(uint16_t val);
 void uart_write_int32(uint32_t val);
 void uart_write_fixed_point(uint32_t val);
-void uart_write_millivolt(uint16_t val);
-void uart_write_milliamp(uint16_t val);
+void uart_write_milli(uint16_t val);
 void uart_drive(void);
 void uart_flush_writes(void);

@@ -75,14 +75,13 @@ void uart_write_str(const char *str)
 }
 
 uint8_t digits_buf[12];
-static uint8_t int_to_digits(uint16_t val)
+static uint8_t int_to_digits(uint8_t num, uint32_t val)
 {
 	uint8_t i;
 	uint8_t num_digits = 0;
 
 	digits_buf[0] = '0';
-
-	for (i = 0; i < 6 && val != 0; i++) {
+	for (i = 0; i < num && val != 0; i++) { //variable num tells function about val size
 		uint8_t digit = val % 10;
 		digits_buf[i] = '0' + digit;
 		val /= 10;
@@ -98,29 +97,11 @@ void uart_write_int(uint16_t val)
 	int8_t i;
 	uint8_t highest_nonzero;
 
-	highest_nonzero = int_to_digits(val);
+	highest_nonzero = int_to_digits(16, val);
 
 	for (i = highest_nonzero-1; i >= 0; i--) {
 		uart_write_ch(digits_buf[i]);
 	}
-}
-
-static uint8_t int32_to_digits(uint32_t val)
-{
-	uint8_t i;
-	uint8_t num_digits = 0;
-
-	digits_buf[0] = '0';
-
-	for (i = 0; i < 12 && val != 0; i++) {
-		uint8_t digit = val % 10;
-		digits_buf[i] = '0' + digit;
-		val /= 10;
-		if (digit) // We only really want to know about non-zero digits
-			num_digits = i;
-	}
-
-	return num_digits + 1;
 }
 
 void uart_write_int32(uint32_t val)
@@ -128,38 +109,24 @@ void uart_write_int32(uint32_t val)
 	int8_t i;
 	uint8_t highest_nonzero;
 
-	highest_nonzero = int32_to_digits(val);
+	highest_nonzero = int_to_digits(32, val);
 
 	for (i = highest_nonzero-1; i >= 0; i--) {
 		uart_write_ch(digits_buf[i]);
 	}
 }
 
-void uart_write_milliamp(uint16_t val)
+void uart_write_milli(uint16_t val) //print milli/amps/volts to uart
 {
 	int8_t i;
 	uint8_t highest_nonzero;
 
-	highest_nonzero = int_to_digits(val);
+	highest_nonzero = int_to_digits(16, val);
 
 	for (i = highest_nonzero-1; i >= 0; i--) {
 		if (i == 2)
-			uart_write_ch('.');
-		uart_write_ch(digits_buf[i]);
-	}
-}
-
-void uart_write_millivolt(uint16_t val)
-{
-	int8_t i;
-	uint8_t highest_nonzero;
-
-	highest_nonzero = int_to_digits(val);
-
-	for (i = highest_nonzero-1; i >= 0; i--) {
-		if (i == 2)
-			uart_write_ch('.');
-		uart_write_ch(digits_buf[i]);
+			uart_write_ch('.'); //decimal point
+		uart_write_ch(digits_buf[i]); //write integer, then after decimal point fraction part
 	}
 }
 
@@ -169,7 +136,7 @@ void uart_write_fixed_point(uint32_t val)
 
 	// Print the integer part
 	tmp = val >> FIXED_SHIFT;
-	uart_write_int(tmp);
+	uart_write_int32(tmp);
 	uart_write_ch('.');
 
 	// Remove the integer part

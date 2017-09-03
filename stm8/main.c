@@ -14,9 +14,13 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with B3603 alternative firmware.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ TODO:
+ try to use strcat, sprintf, itoa - concatenate strings and variables to send it in one package to uart
+ or use int_to_digits froum uart.c
  */
 
-#define FW_VERSION "1.0.1"
+#define FW_VERSION "1.0.2"
 #define MODEL "B3606"
 
 #include "stm8s.h"
@@ -129,7 +133,7 @@ void set_voltage(uint8_t *s)
 	}
 
 	uart_write_str("VOLTAGE: SET ");
-	uart_write_millivolt(val);
+	uart_write_milli(val);
 	uart_write_str("\n");
 	cfg_output.vset = val;
 
@@ -154,7 +158,7 @@ void set_current(uint8_t *s)
 	}
 
 	uart_write_str("CURRENT: SET ");
-	uart_write_milliamp(val);
+	uart_write_milli(val);
 	uart_write_str("\n");
 	cfg_output.cset = val;
 
@@ -191,14 +195,14 @@ void write_onoff(const char *prefix, uint8_t on)
 void write_millivolt(const char *prefix, uint16_t mv)
 {
 	uart_write_str(prefix);
-	uart_write_millivolt(mv);
+	uart_write_milli(mv);
 	uart_write_str("\n");
 }
 
 void write_milliamp(const char *prefix, uint16_t ma)
 {
 	uart_write_str(prefix);
-	uart_write_milliamp(ma);
+	uart_write_milli(ma);
 	uart_write_str("\n");
 }
 
@@ -558,8 +562,6 @@ void ensure_afr0_set(void)
 
 int main()
 {
-	unsigned long i = 0;
-
 	pinout_init();
 	clk_init();
 	uart_init();
