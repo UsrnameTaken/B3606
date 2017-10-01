@@ -4,7 +4,7 @@ OBJ=$(SRC:.c=.rel)
 DEP=$(SRC:%.c=.%.c.d)
 SDCC=sdcc $(CFLAGS)
 
-all: b3606.ihx check_size
+all: clean b3606.ihx check_size
 
 -include $(DEP)
 

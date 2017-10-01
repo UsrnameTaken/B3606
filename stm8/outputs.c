@@ -51,8 +51,8 @@ void pwm_init(void)
 
 	TIM2_CCMR1 = 0x70;    //  Set up to use PWM mode 2.
 	TIM2_CCER1 = 0x03;    //  Output is enabled for channel 1, active low
-	TIM2_CCR1H = 0x00;      //  Start with the PWM signal off
-	TIM2_CCR1L = 0x00;
+	TIM2_CCR1H = 0x00;      //  Start with the PWM signal off, higher register
+	TIM2_CCR1L = 0x00;		// lower register
 
 	// Timers are still off, will be turned on when output is turned on
 }
@@ -80,7 +80,7 @@ uint16_t pwm_from_set(fixed_t set, calibrate_t *cal)
 
 	// x*a
 	tmp = set * cal->a;
-
+	
 	// x*a + b
 	tmp += cal->b;
 
@@ -94,11 +94,11 @@ uint16_t pwm_from_set(fixed_t set, calibrate_t *cal)
 inline void control_voltage(cfg_output_t *cfg, cfg_system_t *sys)
 {
 	uint16_t ctr = pwm_from_set(cfg->vset, &sys->vout_pwm);
-	uart_write_str("PWM VOLTAGE ");
-	uart_write_uint(ctr);
-	uart_write_str("\r\n");
+	//uart_write_str("PWM VOLTAGE ");
+	//uart_write_uint(ctr);
+	//uart_write_str("\r\n");
 
-	TIM2_CCR1H = ctr >> 8;
+	TIM2_CCR1H = ctr >> 8; //bit shift of ctr by 8 to the right
 	TIM2_CCR1L = ctr & 0xFF;
 	TIM2_CR1 |= 0x01; // Enable timer
 }
@@ -106,9 +106,9 @@ inline void control_voltage(cfg_output_t *cfg, cfg_system_t *sys)
 inline void control_current(cfg_output_t *cfg, cfg_system_t *sys)
 {
 	uint16_t ctr = pwm_from_set(cfg->cset, &sys->cout_pwm);
-	uart_write_str("PWM CURRENT ");
-	uart_write_uint(ctr);
-	uart_write_str("\r\n");
+	//uart_write_str("PWM CURRENT ");
+	//uart_write_uint(ctr);
+	//uart_write_str("\r\n");
 
 	TIM1_CCR1H = ctr >> 8;
 	TIM1_CCR1L = ctr & 0xFF;
