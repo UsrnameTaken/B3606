@@ -11,17 +11,13 @@ The difference between B3603 and B3606 is only in converter part.
 Components needed:
 * [B3606](https://www.banggood.com/B3606-NC-Digital-DC-DC-Step-Down-Buck-Module-Constant-Voltage-Current-p-947293.html?rmmds=search) -- The unit being reprogrammed
 * [CP2102](http://www.banggood.com/Wholesale-USB-To-TTL-or-COM-Converter-Module-buildin-in-CP2102-New-p-27989.html?p=PA11121233669201502E) -- A usb-to-serial TTL-level
-* [STLink V2](http://www.aliexpress.com/item/FREE-SHIPPING-ST-Link-V2-stlink-mini-STM8STM32-STLINK-simulator-download-programming-With-Cover/1766455290.html) or STLink/V2 mini -- programmer for the STM8S microcontroller
+* [STLink V2](http://www.aliexpress.com/item/FREE-SHIPPING-ST-Link-V2-stlink-mini-STM8STM32-STLINK-simulator-download-programming-With-Cover/1766455290.html) or [STLink/V2 mini](https://www.waveshare.com/st-link-v2-mini-stm32.htm) -- programmer for the STM8S microcontroller
 
 Software needed:
 * [SDCC v 3.5.0](https://sourceforge.net/projects/sdcc/files/sdcc-linux-x86/3.5.0/) -- source code compiler
 * [stm8flash](https://github.com/vdudouyt/stm8flash) -- STM8 flasher
 
 ## Schematics
-
-These were done by flex, the discussion can be seen in the EEVBlog forum (link at the bottom).
-
-[B3603 Board Schematics in PDF (top and bottom)](docs/B3603_BoardSchematics.pdf)
 
 Bottom board schematics:
 
@@ -43,6 +39,18 @@ Top board schematics:
 
 ![Top Board Side 2](docs/TopBoardSide2.jpg)
 
+## Differences between B3603 and B3606
+
+Mainly the units are the same. Top board and bottom part under top board is the same (in my unit the exception is in R8, R19 and R26 values). There is a high chance, that the program will work on every simmilar board, but without guarantee.
+Differences in values:
+
+Resistor | B3603 value | B3606 value
+--- | --- | ---
+R8 | 1k | 1k5
+R19 | 10k | 20k
+R26 | 15k | 20k
+
+Those differences probably make the board to not precise values of output voltage and current, but it's about 0,3 V (B3606 measure) or 0,6 V (cheap multimeter measure) at 12 V VIN. I'll look after this in version 1.0.3.
 
 ### MCU
 
@@ -93,7 +101,7 @@ Lets name the different pinout components, left and right are as seen looking at
 | Pin 20 | PD3 (HS) / AIN4 / TIM2\_CH2 / ADC\_ETR | Left connector | Pin 3 | Vin sense (Vin/16)
 
 
-The buttons are connected in a strange setup where all four are on two pins.
+The buttons are connected in a strange setup where all four are on two pins. You can see oscillograms in [this directory](https://github.com/UsrnameTaken/B3606/tree/master/docs/b3606_uswitch).
 
 The CV/CC leds are in serial with a lead between them throuh a 10K resistor to pin PA3, by changing the pin between Output HIGH, Output LOW and Input it is possible to make one of them on or both off.
 
@@ -131,9 +139,3 @@ There are two 74HC595 TSSOP16, these control the 4 digit 7 segment display, and 
 
 * [Manufacturer product page](http://www.mhinstek.com/product/html/?106.html) (Chinese) ([English translation](https://translate.google.com/translate?sl=auto&tl=en&js=y&prev=_t&hl=en&ie=UTF-8&u=http%3A%2F%2Fwww.mhinstek.com%2Fproduct%2Fhtml%2F%3F106.html&edit-text=))
 * [EEVBlog forum discussion](http://www.eevblog.com/forum/reviews/b3603-dcdc-buck-converter-mini-review-and-how-the-set-key-could-be-fatal/)
-
-Components needed:
-* [B3606](https://www.banggood.com/B3606-NC-Digital-DC-DC-Step-Down-Buck-Module-Constant-Voltage-Current-p-947293.html?rmmds=search) -- The unit being reprogrammed
-* [CP2102](http://www.banggood.com/Wholesale-USB-To-TTL-or-COM-Converter-Module-buildin-in-CP2102-New-p-27989.html?p=PA11121233669201502E) -- A usb-to-serial TTL-level
-* [STLink V2](http://www.aliexpress.com/item/FREE-SHIPPING-ST-Link-V2-stlink-mini-STM8STM32-STLINK-simulator-download-programming-With-Cover/1766455290.html) -- programmer for the STM8S microcontroller
-
