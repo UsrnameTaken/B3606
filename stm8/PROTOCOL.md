@@ -4,12 +4,12 @@ This is a description of the serial protocol for this alternative firmware.
 
 ## Configuration
 
-The serial works at 9600 8N1, the low speed is intended to allow MCU to handle
+The serial works at 38400 8N1, the low speed is intended to allow MCU to handle
 the flow without interfering too much with the rest of the work.
 
 ## Startup
 
-The controller will send a welcome message "B3603 alternative firmware vX.XX"
+The controller will send a welcome message "B3606 alternative firmware vX.XX"
 
 ## Commands
 
@@ -20,7 +20,7 @@ sent on the output to indicate this failure.
 ### Model Query
 
 * Send: "MODEL"
-* Receive: "MODEL: B3603"
+* Receive: "MODEL: B3606"
 
 This is just the model information, it is fixed for this firmware at this time
 as it only runs on a single device. There is however another device that seems
@@ -54,7 +54,7 @@ If auto commit is on, this command is not going to change anything.
 Set the auto commit setting.
 
 ### Name Set
-
+! not exist
 * Send: "SNAME"
 * Receive: "SNAME: <name>"
 
@@ -67,14 +67,14 @@ they must be printable characters.
 * Receive: detailed on calibration, mostly useful to debug and comparison of units
 
 ### Voltage Capabilities Query
-
+! not exist
 * Send: "VLIST"
-* Receive: "VLIST: 1.0000/12.0000/0.0001"
+* Receive: "VLIST: 1.000/12.000/0.001"
 
 Returns minimum voltage, maximum voltage and step size.
 
 ### Current Capabilities Query
-
+! not exist
 * Send: "CLIST"
 * Receive: "CLIST: 0.001/3.000/0.001"
 
@@ -89,15 +89,15 @@ OUTPUT0 disables the output and OUTPUT1 enables the output.
 
 ### Voltage Set
 
-* Send: "VOLTAGE X.XXXX"
-* Receive: "VOLTAGE: SET X.XXXX"
+* Send: "VOLTAGE X.XXX"
+* Receive: "VOLTAGE: SET X.XXX"
 
 Set the maximum voltage level.
 
 ### Current Set
 
-* Send: "CURRENT X.XXXX"
-* Receive: "CURRENT: SET X.XXXX"
+* Send: "CURRENT X.XXX"
+* Receive: "CURRENT: SET X.XXX"
 
 Set the maximum current level.
 
@@ -114,8 +114,8 @@ intervention when the power comes back after a power outage.
 
 ### Over voltage protection
 
-* Send: "VSHUTDOWN X.XXXX" or "VSHUTDOWN 0"
-* Receive: "VSHUTDOWN: X.XXXX" or "VSHUTDOWN: DISABLED"
+* Send: "VSHUTDOWN X.XXX" or "VSHUTDOWN 0"
+* Receive: "VSHUTDOWN: X.XXX" or "VSHUTDOWN: DISABLED"
 
 When a VSHUTDOWN is set and reached the unit will turn off the output to avoid
 an over-voltage situation. This would be used in a constant current situation
